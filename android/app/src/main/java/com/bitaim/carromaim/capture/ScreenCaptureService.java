@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.hardware.display.DisplayManager;
@@ -76,7 +77,18 @@ public class ScreenCaptureService extends Service {
         super.onCreate();
         INSTANCE = this;
         createChannel();
-        startForeground(NOTIF_ID, buildNotification());
+        // This service is started only after the user grants MediaProjection consent.
+        // Android 10+ requires the mediaProjection foreground-service type; Android 14+
+        // also requires the matching manifest permission and service declaration.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                    NOTIF_ID,
+                    buildNotification(),
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION
+            );
+        } else {
+            startForeground(NOTIF_ID, buildNotification());
+        }
 
         WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         DisplayMetrics dm = new DisplayMetrics();
