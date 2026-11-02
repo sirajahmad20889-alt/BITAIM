@@ -7,6 +7,8 @@
 
     <!-- Foreground services: overlay + screen capture -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Required for MediaProjection foreground service on Android 14+ -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
 
     <!-- Wake lock keeps overlay alive while playing -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -53,15 +55,11 @@
             android:name=".overlay.FloatingOverlayService"
             android:exported="false" />
 
-        <!--
-            ScreenCaptureService: foregroundServiceType="mediaProjection" is
-            API 29+ only; omitted here for minSdk 21 compatibility.
-            The MediaProjection API itself works fine without the manifest attribute
-            on Android 5-8.
-        -->
+        <!-- Screen capture must declare the mediaProjection foreground-service type. -->
         <service
             android:name=".capture.ScreenCaptureService"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
 
     </application>
 </manifest>
